@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Personal Dashboard</h1>
+        <div class="date-display" id="currentDate"></div>
+        <div class="user-info" id="user-info" style="display: none;">
+            <span id="user-name"></span>
+            <button onclick="logout()" class="logout-btn">Logout</button>
+        </div>
+    </header>
+
+    <!-- Login Section -->
+    <div class="login-section" id="login-section">
+        <div class="login-card">
+            <h2>Login to Personal Dashboard</h2>
+            <p>This app uses GitHub authentication to securely store your data.</p>
+            
+            <div class="login-steps">
+                <div class="step">
+                    <h3>Step 1: Create a Personal Access Token</h3>
+                    <p>Go to <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings → Personal Access Tokens</a></p>
+                    <p>Create a new token with <strong>gist</strong> scope</p>
+                </div>
+                
+                <div class="step">
+                    <h3>Step 2: Enter Your Token</h3>
+                    <div class="token-input-group">
+                        <input type="password" id="token-input" placeholder="Paste your GitHub token here">
+                        <button onclick="authenticateWithToken()">Login</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="error-message" id="error-message" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Token Input Section (alternative) -->
+    <div class="token-section" id="token-section" style="display: none;">
+        <div class="token-card">
+            <h3>Enter GitHub Personal Access Token</h3>
+            <p>Create a token at <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings</a> with "gist" scope</p>
+            <div class="token-input-group">
+                <input type="password" id="token-input-alt" placeholder="Paste your token here">
+                <button onclick="authenticateWithToken()">Authenticate</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="dashboard" id="dashboard" style="display: none;">
+        <!-- Weight Tracking Section -->
+        <section class="card" id="weight-section">
+            <h2>Weight Tracking</h2>
+            <div class="input-group">
+                <input type="number" id="weight-input" placeholder="Weight (lbs/kg)" step="0.1">
+                <button onclick="addWeight()">Add Weight</button>
+            </div>
+            <div class="current-stats">
+                <p>Current Weight: <span id="current-weight">--</span></p>
+                <p>Weight Change: <span id="weight-change">--</span></p>
+            </div>
+            <div class="weight-history" id="weight-history"></div>
+        </section>
+
+        <!-- Calorie Deficit Tracking Section -->
+        <section class="card" id="calorie-section">
+            <h2>Calorie Deficit Tracking</h2>
+            <div class="input-group">
+                <input type="number" id="calorie-goal" placeholder="Daily Calorie Goal" step="50">
+                <input type="number" id="calories-consumed" placeholder="Calories Consumed" step="10">
+                <button onclick="logCalories()">Log Day</button>
+            </div>
+            <div class="current-stats">
+                <p>Today's Goal: <span id="today-calorie-goal">--</span></p>
+                <p>Consumed: <span id="today-consumed">--</span></p>
+                <p>Deficit: <span id="today-deficit">--</span></p>
+            </div>
+            <div class="adherence-stats">
+                <p>Weekly Adherence: <span id="weekly-adherence">--</span></p>
+            </div>
+        </section>
+
+        <!-- Diary Entry Section -->
+        <section class="card" id="diary-section">
+            <h2>Daily Diary</h2>
+            <div class="diary-controls">
+                <input type="date" id="diary-date" onchange="loadDiaryEntry()">
+                <button onclick="saveDiaryEntry()">Save Entry</button>
+            </div>
+            <textarea id="diary-content" placeholder="Write your diary entry for today..."></textarea>
+            <div class="diary-entries" id="recent-entries">
+                <h3>Recent Entries</h3>
+                <div id="entries-list"></div>
+            </div>
+        </section>
+
+        <!-- Dashboard Overview -->
+        <section class="card" id="overview-section">
+            <h2>Overview</h2>
+            <div class="overview-stats">
+                <div class="stat-item">
+                    <h3>Total Weight Change</h3>
+                    <span id="total-weight-change">--</span>
+                </div>
+                <div class="stat-item">
+                    <h3>Average Daily Deficit</h3>
+                    <span id="avg-deficit">--</span>
+                </div>
+                <div class="stat-item">
+                    <h3>Diary Entries</h3>
+                    <span id="total-entries">--</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
