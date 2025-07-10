@@ -148,6 +148,8 @@ function switchTab(tabName) {
         document.getElementById('diary-view').style.display = 'block';
         document.getElementById('diary-tab').classList.add('active');
         updateDiaryTitle();
+        updateDiaryDisplay(); // Load diary entries when switching to diary tab
+        loadDiaryEntry(); // Load current diary entry
     } else if (tabName === 'dashboard') {
         document.getElementById('dashboard-view').style.display = 'block';
         document.getElementById('dashboard-tab').classList.add('active');
@@ -401,10 +403,14 @@ function updateDiaryDisplay() {
             // Old format
             title = '';
             preview = entry.substring(0, 80) + (entry.length > 80 ? '...' : '');
-        } else {
+        } else if (entry && typeof entry === 'object') {
             // New format
             title = entry.title || 'Untitled';
-            preview = entry.content.substring(0, 60) + (entry.content.length > 60 ? '...' : '');
+            preview = entry.content ? entry.content.substring(0, 60) + (entry.content.length > 60 ? '...' : '') : '';
+        } else {
+            // Fallback
+            title = 'Unknown';
+            preview = 'Unable to load entry';
         }
         
         return `<div class="entry-item" onclick="loadSpecificEntry('${date}')">
