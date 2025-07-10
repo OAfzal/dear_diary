@@ -68,13 +68,35 @@
             
             <div class="diary-main">
                 <div class="diary-header">
-                    <h2 id="diary-entry-title">Today's Entry</h2>
+                    <h2 id="diary-entry-date">Today's Entry</h2>
                     <button class="save-btn" onclick="saveDiaryEntry()">Save Entry</button>
                 </div>
+                
                 <div class="diary-editor">
-                    <textarea id="diary-content" placeholder="Dear diary...
-
-What's on your mind today?"></textarea>
+                    <div class="title-section">
+                        <input type="text" id="diary-title" class="diary-title-input" placeholder="Entry title..." />
+                    </div>
+                    
+                    <div class="formatting-toolbar" id="formatting-toolbar" style="display: none;">
+                        <button type="button" onclick="formatText('bold')" class="format-btn" title="Bold">
+                            <strong>B</strong>
+                        </button>
+                        <button type="button" onclick="formatText('italic')" class="format-btn" title="Italic">
+                            <em>I</em>
+                        </button>
+                        <button type="button" onclick="formatText('insertUnorderedList')" class="format-btn" title="Bullet List">
+                            •
+                        </button>
+                    </div>
+                    
+                    <div class="content-section">
+                        <div id="diary-content" class="diary-content-editor" contenteditable="true" placeholder="What's on your mind today?"></div>
+                    </div>
+                    
+                    <div class="editor-footer">
+                        <span id="word-count" class="word-count">0 words</span>
+                        <span id="save-status" class="save-status"></span>
+                    </div>
                 </div>
             </div>
         </div>

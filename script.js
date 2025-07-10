@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
 async function initializeApp() {
     updateCurrentDate();
     setTodayDate();
+    setupDiaryEventListeners();
     
     // Check OAuth callback first
     const urlParams = new URLSearchParams(window.location.search);
@@ -39,6 +40,38 @@ async function initializeApp() {
     
     // Show login if not authenticated
     showLogin();
+}
+
+function setupDiaryEventListeners() {
+    // Add event listeners when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        const contentEditor = document.getElementById('diary-content');
+        const titleInput = document.getElementById('diary-title');
+        
+        if (contentEditor) {
+            // Show toolbar when content is focused
+            contentEditor.addEventListener('focus', showFormattingToolbar);
+            
+            // Update word count on input
+            contentEditor.addEventListener('input', updateWordCount);
+            
+            // Auto-save on blur (when user leaves the field)
+            contentEditor.addEventListener('blur', function() {
+                if (contentEditor.textContent.trim() || titleInput.value.trim()) {
+                    saveDiaryEntry();
+                }
+            });
+        }
+        
+        if (titleInput) {
+            // Auto-save on blur for title too
+            titleInput.addEventListener('blur', function() {
+                if (contentEditor.textContent.trim() || titleInput.value.trim()) {
+                    saveDiaryEntry();
+                }
+            });
+        }
+    });
 }
 
 function showLogin() {
@@ -295,33 +328,58 @@ function updateWeeklyAdherence(calorieData) {
 // Diary Functions
 async function saveDiaryEntry() {
     const dateInput = document.getElementById('diary-date');
+    const titleInput = document.getElementById('diary-title');
     const contentInput = document.getElementById('diary-content');
     
     const date = dateInput.value;
-    const content = contentInput.value.trim();
+    const title = titleInput.value.trim();
+    const content = contentInput.textContent.trim();
     
-    if (!date || !content) {
-        alert('Please select a date and enter some content');
+    if (!date || (!title && !content)) {
+        alert('Please select a date and enter a title or content');
         return;
     }
     
-    appData.diaryData[date] = content;
+    // Store both title and content in new format, backward compatible
+    appData.diaryData[date] = {
+        title: title || '',
+        content: content || '',
+        timestamp: new Date().toISOString()
+    };
     
     await saveData();
-    
-    contentInput.value = '';
+    showSaveStatus('Saved!');
     updateDiaryDisplay();
+    updateWordCount();
 }
 
 function loadDiaryEntry() {
     const dateInput = document.getElementById('diary-date');
+    const titleInput = document.getElementById('diary-title');
     const contentInput = document.getElementById('diary-content');
     
     const date = dateInput.value;
     const diaryData = getDiaryData();
+    const entry = diaryData[date];
     
-    contentInput.value = diaryData[date] || '';
+    // Handle both old format (string) and new format (object)
+    if (entry) {
+        if (typeof entry === 'string') {
+            // Old format - content only
+            titleInput.value = '';
+            contentInput.textContent = entry;
+        } else {
+            // New format - title and content
+            titleInput.value = entry.title || '';
+            contentInput.textContent = entry.content || '';
+        }
+    } else {
+        titleInput.value = '';
+        contentInput.textContent = '';
+    }
+    
     updateDiaryTitle();
+    updateWordCount();
 }
 
 function getDiaryData() {
@@ -336,14 +394,62 @@ function updateDiaryDisplay() {
     const recentEntries = dates.slice(0, 5);
     entriesList.innerHTML = recentEntries.map(date => {
         const displayDate = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        const preview = diaryData[date].substring(0, 100) + (diaryData[date].length > 100 ? '...' : '');
-        return `<div class="entry-item" onclick="loadSpecificEntry('${date}')">${displayDate}: ${preview}</div>`;
+        const entry = diaryData[date];
+        
+        let title, preview;
+        if (typeof entry === 'string') {
+            // Old format
+            title = '';
+            preview = entry.substring(0, 80) + (entry.length > 80 ? '...' : '');
+        } else {
+            // New format
+            title = entry.title || 'Untitled';
+            preview = entry.content.substring(0, 60) + (entry.content.length > 60 ? '...' : '');
+        }
+        
+        return `<div class="entry-item" onclick="loadSpecificEntry('${date}')">
+            <div class="entry-date">${displayDate}</div>
+            <div class="entry-title">${title}</div>
+            <div class="entry-preview">${preview}</div>
+        </div>`;
     }).join('');
 }
 
 function loadSpecificEntry(date) {
     document.getElementById('diary-date').value = date;
     loadDiaryEntry();
+}
+
+// Modern diary utility functions
+function formatText(command) {
+    document.execCommand(command, false, null);
+    document.getElementById('diary-content').focus();
+}
+
+function updateWordCount() {
+    const content = document.getElementById('diary-content').textContent || '';
+    const words = content.trim() ? content.trim().split(/\s+/).length : 0;
+    document.getElementById('word-count').textContent = `${words} word${words !== 1 ? 's' : ''}`;
+}
+
+function showSaveStatus(message) {
+    const statusElement = document.getElementById('save-status');
+    statusElement.textContent = message;
+    statusElement.classList.add('visible');
+    
+    setTimeout(() => {
+        statusElement.classList.remove('visible');
+    }, 2000);
+}
+
+function showFormattingToolbar() {
+    const toolbar = document.getElementById('formatting-toolbar');
+    toolbar.style.display = 'flex';
+}
+
+function hideFormattingToolbar() {
+    const toolbar = document.getElementById('formatting-toolbar');
+    toolbar.style.display = 'none';
 }
 
 // Dashboard Overview Functions
