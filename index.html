@@ -40,71 +40,135 @@
         </div>
     </div>
 
-    <main class="dashboard" id="dashboard" style="display: none;">
-        <!-- Weight Tracking Section -->
-        <section class="card" id="weight-section">
-            <h2>Weight Tracking</h2>
-            <div class="input-group">
-                <input type="number" id="weight-input" placeholder="Weight (lbs/kg)" step="0.1">
-                <button onclick="addWeight()">Add Weight</button>
-            </div>
-            <div class="current-stats">
-                <p>Current Weight: <span id="current-weight">--</span></p>
-                <p>Weight Change: <span id="weight-change">--</span></p>
-            </div>
-            <div class="weight-history" id="weight-history"></div>
-        </section>
+    <!-- Navigation Tabs -->
+    <nav class="tab-navigation" id="tab-navigation" style="display: none;">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('diary')" id="diary-tab">
+                📝 Diary
+            </button>
+            <button class="tab-btn" onclick="switchTab('dashboard')" id="dashboard-tab">
+                📊 Dashboard
+            </button>
+        </div>
+    </nav>
 
-        <!-- Calorie Deficit Tracking Section -->
-        <section class="card" id="calorie-section">
-            <h2>Calorie Deficit Tracking</h2>
-            <div class="input-group">
-                <input type="number" id="calorie-goal" placeholder="Daily Calorie Goal" step="50">
-                <input type="number" id="calories-consumed" placeholder="Calories Consumed" step="10">
-                <button onclick="logCalories()">Log Day</button>
-            </div>
-            <div class="current-stats">
-                <p>Today's Goal: <span id="today-calorie-goal">--</span></p>
-                <p>Consumed: <span id="today-consumed">--</span></p>
-                <p>Deficit: <span id="today-deficit">--</span></p>
-            </div>
-            <div class="adherence-stats">
-                <p>Weekly Adherence: <span id="weekly-adherence">--</span></p>
-            </div>
-        </section>
-
-        <!-- Diary Entry Section -->
-        <section class="card" id="diary-section">
-            <h2>Daily Diary</h2>
-            <div class="diary-controls">
-                <input type="date" id="diary-date" onchange="loadDiaryEntry()">
-                <button onclick="saveDiaryEntry()">Save Entry</button>
-            </div>
-            <textarea id="diary-content" placeholder="Write your diary entry for today..."></textarea>
-            <div class="diary-entries" id="recent-entries">
-                <h3>Recent Entries</h3>
-                <div id="entries-list"></div>
-            </div>
-        </section>
-
-        <!-- Dashboard Overview -->
-        <section class="card" id="overview-section">
-            <h2>Overview</h2>
-            <div class="overview-stats">
-                <div class="stat-item">
-                    <h3>Total Weight Change</h3>
-                    <span id="total-weight-change">--</span>
+    <!-- Diary Section -->
+    <main class="diary-view" id="diary-view" style="display: none;">
+        <div class="diary-container">
+            <div class="diary-sidebar">
+                <div class="date-picker-section">
+                    <h3>Select Date</h3>
+                    <input type="date" id="diary-date" onchange="loadDiaryEntry()">
                 </div>
-                <div class="stat-item">
-                    <h3>Average Daily Deficit</h3>
-                    <span id="avg-deficit">--</span>
-                </div>
-                <div class="stat-item">
-                    <h3>Diary Entries</h3>
-                    <span id="total-entries">--</span>
+                <div class="recent-entries-section">
+                    <h3>Recent Entries</h3>
+                    <div id="entries-list"></div>
                 </div>
             </div>
-        </section>
+            
+            <div class="diary-main">
+                <div class="diary-header">
+                    <h2 id="diary-entry-title">Today's Entry</h2>
+                    <button class="save-btn" onclick="saveDiaryEntry()">Save Entry</button>
+                </div>
+                <div class="diary-editor">
+                    <textarea id="diary-content" placeholder="Dear diary...
+
+What's on your mind today?"></textarea>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Dashboard Section -->
+    <main class="dashboard-view" id="dashboard-view" style="display: none;">
+        <div class="dashboard-container">
+            <!-- Quick Stats Overview -->
+            <section class="stats-overview">
+                <div class="stat-card">
+                    <div class="stat-icon">⚖️</div>
+                    <div class="stat-content">
+                        <h3>Current Weight</h3>
+                        <span class="stat-value" id="current-weight">--</span>
+                        <span class="stat-change" id="weight-change">--</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-content">
+                        <h3>Today's Deficit</h3>
+                        <span class="stat-value" id="today-deficit">--</span>
+                        <span class="stat-sub">Goal: <span id="today-calorie-goal">--</span></span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-content">
+                        <h3>Weekly Adherence</h3>
+                        <span class="stat-value" id="weekly-adherence">--</span>
+                        <span class="stat-sub">This week</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📝</div>
+                    <div class="stat-content">
+                        <h3>Total Entries</h3>
+                        <span class="stat-value" id="total-entries">--</span>
+                        <span class="stat-sub">Diary entries</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Weight Tracking Section -->
+            <section class="dashboard-card">
+                <div class="card-header">
+                    <h2>⚖️ Weight Tracking</h2>
+                </div>
+                <div class="card-content">
+                    <div class="input-group">
+                        <input type="number" id="weight-input" placeholder="Enter weight" step="0.1">
+                        <button onclick="addWeight()" class="action-btn">Add Weight</button>
+                    </div>
+                    <div class="weight-history" id="weight-history"></div>
+                </div>
+            </section>
+
+            <!-- Calorie Tracking Section -->
+            <section class="dashboard-card">
+                <div class="card-header">
+                    <h2>🔥 Calorie Tracking</h2>
+                </div>
+                <div class="card-content">
+                    <div class="input-group">
+                        <input type="number" id="calorie-goal" placeholder="Daily goal" step="50">
+                        <input type="number" id="calories-consumed" placeholder="Consumed" step="10">
+                        <button onclick="logCalories()" class="action-btn">Log Day</button>
+                    </div>
+                    <div class="calorie-stats">
+                        <p>Consumed: <span id="today-consumed">--</span></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Progress Overview -->
+            <section class="dashboard-card">
+                <div class="card-header">
+                    <h2>📈 Progress Overview</h2>
+                </div>
+                <div class="card-content">
+                    <div class="progress-stats">
+                        <div class="progress-item">
+                            <span class="progress-label">Total Weight Change</span>
+                            <span class="progress-value" id="total-weight-change">--</span>
+                        </div>
+                        <div class="progress-item">
+                            <span class="progress-label">Average Daily Deficit</span>
+                            <span class="progress-value" id="avg-deficit">--</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
     </main>
 
     <script src="config.js"></script>

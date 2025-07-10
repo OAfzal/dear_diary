@@ -43,13 +43,15 @@ async function initializeApp() {
 
 function showLogin() {
     document.getElementById('login-section').style.display = 'block';
-    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('tab-navigation').style.display = 'none';
+    document.getElementById('diary-view').style.display = 'none';
+    document.getElementById('dashboard-view').style.display = 'none';
     document.getElementById('user-info').style.display = 'none';
 }
 
 async function showDashboard() {
     document.getElementById('login-section').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('tab-navigation').style.display = 'block';
     document.getElementById('user-info').style.display = 'block';
     
     // Load user info
@@ -58,9 +60,9 @@ async function showDashboard() {
         document.getElementById('user-name').textContent = user.login;
     }
     
-    // Load data and dashboard
+    // Load data and show diary by default
     await loadData();
-    loadDashboard();
+    switchTab('diary');
 }
 
 async function authenticateWithToken() {
@@ -96,6 +98,49 @@ function clearError() {
 
 function logout() {
     githubAuth.logout();
+}
+
+// Tab switching functionality
+function switchTab(tabName) {
+    // Hide all views
+    document.getElementById('diary-view').style.display = 'none';
+    document.getElementById('dashboard-view').style.display = 'none';
+    
+    // Remove active class from all tabs
+    document.getElementById('diary-tab').classList.remove('active');
+    document.getElementById('dashboard-tab').classList.remove('active');
+    
+    // Show selected view and mark tab as active
+    if (tabName === 'diary') {
+        document.getElementById('diary-view').style.display = 'block';
+        document.getElementById('diary-tab').classList.add('active');
+        updateDiaryTitle();
+    } else if (tabName === 'dashboard') {
+        document.getElementById('dashboard-view').style.display = 'block';
+        document.getElementById('dashboard-tab').classList.add('active');
+        loadDashboard();
+    }
+}
+
+// Update diary title based on selected date
+function updateDiaryTitle() {
+    const dateInput = document.getElementById('diary-date');
+    const titleElement = document.getElementById('diary-entry-title');
+    
+    if (dateInput.value) {
+        const selectedDate = new Date(dateInput.value);
+        const today = new Date();
+        
+        // Check if selected date is today
+        if (selectedDate.toDateString() === today.toDateString()) {
+            titleElement.textContent = "Today's Entry";
+        } else {
+            const options = { weekday: 'long', month: 'long', day: 'numeric' };
+            titleElement.textContent = selectedDate.toLocaleDateString('en-US', options);
+        }
+    } else {
+        titleElement.textContent = "Today's Entry";
+    }
 }
 
 // Debug function - delete current gist and start fresh
@@ -276,6 +321,7 @@ function loadDiaryEntry() {
     const diaryData = getDiaryData();
     
     contentInput.value = diaryData[date] || '';
+    updateDiaryTitle();
 }
 
 function getDiaryData() {
