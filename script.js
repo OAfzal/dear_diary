@@ -98,6 +98,19 @@ function logout() {
     githubAuth.logout();
 }
 
+// Debug function - delete current gist and start fresh
+async function startFresh() {
+    if (confirm('Are you sure you want to delete all your data and start fresh? This cannot be undone!')) {
+        const deleted = await githubAuth.deleteCurrentGist();
+        if (deleted) {
+            alert('Gist deleted! Refreshing page to start fresh...');
+            window.location.reload();
+        } else {
+            alert('Failed to delete gist. Check console for errors.');
+        }
+    }
+}
+
 // Date utility functions
 function updateCurrentDate() {
     const now = new Date();

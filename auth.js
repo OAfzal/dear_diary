@@ -273,6 +273,37 @@ class GitHubAuth {
         }
     }
 
+    // Delete current gist (for starting fresh)
+    async deleteCurrentGist() {
+        if (!this.gistId) {
+            console.log('No gist to delete');
+            return false;
+        }
+        
+        try {
+            const response = await fetch(`https://api.github.com/gists/${this.gistId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `token ${this.token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            
+            if (response.ok || response.status === 404) {
+                console.log('Gist deleted successfully');
+                this.gistId = null;
+                localStorage.removeItem('gist_id');
+                return true;
+            } else {
+                console.error('Failed to delete gist, status:', response.status);
+                return false;
+            }
+        } catch (error) {
+            console.error('Error deleting gist:', error);
+            return false;
+        }
+    }
+
     // Save data to gist
     async saveData(data) {
         if (!this.gistId) {
