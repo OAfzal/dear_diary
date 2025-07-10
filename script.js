@@ -95,7 +95,7 @@ async function showDashboard() {
     
     // Load data and show diary by default
     await loadData();
-    switchTab('diary');
+    await switchTab('diary');
 }
 
 async function authenticateWithToken() {
@@ -134,7 +134,7 @@ function logout() {
 }
 
 // Tab switching functionality
-function switchTab(tabName) {
+async function switchTab(tabName) {
     // Hide all views
     document.getElementById('diary-view').style.display = 'none';
     document.getElementById('dashboard-view').style.display = 'none';
@@ -148,12 +148,18 @@ function switchTab(tabName) {
         document.getElementById('diary-view').style.display = 'block';
         document.getElementById('diary-tab').classList.add('active');
         updateDiaryTitle();
+        
+        // Ensure data is loaded before updating diary display
+        if (!appData.lastUpdated) {
+            await loadData();
+        }
+        
         updateDiaryDisplay(); // Load diary entries when switching to diary tab
         loadDiaryEntry(); // Load current diary entry
     } else if (tabName === 'dashboard') {
         document.getElementById('dashboard-view').style.display = 'block';
         document.getElementById('dashboard-tab').classList.add('active');
-        loadDashboard();
+        await loadDashboard();
     }
 }
 
@@ -520,7 +526,12 @@ async function saveData() {
 }
 
 // Load dashboard data
-function loadDashboard() {
+async function loadDashboard() {
+    // Ensure data is loaded before updating dashboard
+    if (!appData.lastUpdated) {
+        await loadData();
+    }
+    
     updateWeightDisplay();
     updateCalorieDisplay();
     updateDiaryDisplay();
