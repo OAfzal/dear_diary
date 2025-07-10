@@ -19,25 +19,11 @@
     <!-- Login Section -->
     <div class="login-section" id="login-section">
         <div class="login-card">
-            <h2>Login to Personal Dashboard</h2>
-            <p>This app uses GitHub authentication to securely store your data.</p>
-            
-            <div class="login-steps">
-                <div class="step">
-                    <h3>Step 1: Create a Personal Access Token</h3>
-                    <p>Go to <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings → Personal Access Tokens</a></p>
-                    <p>Create a new token with <strong>gist</strong> scope</p>
-                </div>
-                
-                <div class="step">
-                    <h3>Step 2: Enter Your Token</h3>
-                    <div class="token-input-group">
-                        <input type="password" id="token-input" placeholder="Paste your GitHub token here">
-                        <button onclick="authenticateWithToken()">Login</button>
-                    </div>
-                </div>
+            <h2>Login</h2>
+            <div class="token-input-group">
+                <input type="password" id="token-input" placeholder="Enter your GitHub token">
+                <button onclick="authenticateWithToken()">Login</button>
             </div>
-            
             <div class="error-message" id="error-message" style="display: none;"></div>
         </div>
     </div>

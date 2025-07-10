@@ -24,15 +24,20 @@ class GitHubAuth {
                 }
             });
             
+            console.log('GitHub API response status:', response.status);
+            
             if (response.ok) {
                 this.user = await response.json();
                 return this.user;
+            } else {
+                const errorText = await response.text();
+                console.error('GitHub API error:', response.status, errorText);
+                throw new Error(`GitHub API error: ${response.status} - ${errorText}`);
             }
         } catch (error) {
             console.error('Error fetching user:', error);
+            throw error;
         }
-        
-        return null;
     }
 
     // Check if current user is authorized
@@ -88,13 +93,26 @@ class GitHubAuth {
         localStorage.setItem('github_token', token);
         
         // Verify token and user
-        const user = await this.getCurrentUser();
-        if (user && user.login === GITHUB_CONFIG.AUTHORIZED_USER) {
-            this.hideTokenInput();
-            return true;
-        } else {
+        try {
+            const user = await this.getCurrentUser();
+            console.log('Retrieved user:', user);
+            console.log('Expected user:', GITHUB_CONFIG.AUTHORIZED_USER);
+            
+            if (user && user.login === GITHUB_CONFIG.AUTHORIZED_USER) {
+                this.hideTokenInput();
+                return true;
+            } else {
+                this.logout();
+                if (!user) {
+                    throw new Error('Invalid token - unable to get user info');
+                } else {
+                    throw new Error(`Unauthorized user: ${user.login} (expected: ${GITHUB_CONFIG.AUTHORIZED_USER})`);
+                }
+            }
+        } catch (error) {
+            console.error('Token validation error:', error);
             this.logout();
-            throw new Error('Invalid token or unauthorized user');
+            throw new Error('Token validation failed: ' + error.message);
         }
     }
 

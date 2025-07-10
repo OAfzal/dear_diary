@@ -85,9 +85,10 @@ function showError(message) {
     const errorDiv = document.getElementById('error-message');
     errorDiv.textContent = message;
     errorDiv.style.display = 'block';
+    console.error('Auth error:', message);
     setTimeout(() => {
         errorDiv.style.display = 'none';
-    }, 5000);
+    }, 8000);
 }
 
 function logout() {
