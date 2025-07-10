@@ -120,9 +120,9 @@ class GitHubAuth {
     logout() {
         this.token = null;
         this.user = null;
-        this.gistId = null;
+        // Don't clear gistId - we want to keep it to find the same gist on next login
         localStorage.removeItem('github_token');
-        localStorage.removeItem('gist_id');
+        // Don't remove gist_id - we need it to persist across sessions
         
         // Clear URL parameters
         window.history.replaceState({}, document.title, window.location.pathname);
@@ -133,8 +133,8 @@ class GitHubAuth {
 
     // Get or create data gist
     async getOrCreateDataGist() {
+        // First, try to use cached gist ID if we have one
         if (this.gistId) {
-            // Try to get existing gist
             try {
                 const response = await fetch(`https://api.github.com/gists/${this.gistId}`, {
                     headers: {
@@ -147,11 +147,69 @@ class GitHubAuth {
                     return await response.json();
                 }
             } catch (error) {
-                console.error('Error fetching gist:', error);
+                console.error('Error fetching cached gist:', error);
             }
         }
         
-        // Create new gist
+        // If no cached gist or it failed, search for existing gists
+        try {
+            const response = await fetch('https://api.github.com/gists', {
+                headers: {
+                    'Authorization': `token ${this.token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            
+            if (response.ok) {
+                const gists = await response.json();
+                
+                // Look for our personal tracker gist
+                const trackerGist = gists.find(gist => 
+                    gist.description === 'Personal Tracker Data' &&
+                    gist.files[GITHUB_CONFIG.GIST_FILENAME]
+                );
+                
+                if (trackerGist) {
+                    this.gistId = trackerGist.id;
+                    localStorage.setItem('gist_id', this.gistId);
+                    
+                    // Fetch the full gist content (the list API doesn't include file content)
+                    const fullGistResponse = await fetch(`https://api.github.com/gists/${this.gistId}`, {
+                        headers: {
+                            'Authorization': `token ${this.token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+                    
+                    if (fullGistResponse.ok) {
+                        const fullGist = await fullGistResponse.json();
+                        
+                        // If the gist is public, make it private for security
+                        if (fullGist.public) {
+                            try {
+                                await fetch(`https://api.github.com/gists/${this.gistId}`, {
+                                    method: 'PATCH',
+                                    headers: {
+                                        'Authorization': `token ${this.token}`,
+                                        'Accept': 'application/vnd.github.v3+json',
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ public: false })
+                                });
+                            } catch (error) {
+                                console.error('Failed to make gist private:', error);
+                            }
+                        }
+                        
+                        return fullGist;
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error searching for existing gists:', error);
+        }
+        
+        // Create new gist if none found
         const initialData = {
             weightData: {},
             calorieData: {},
@@ -197,8 +255,13 @@ class GitHubAuth {
     async loadData() {
         try {
             const gist = await this.getOrCreateDataGist();
-            const fileContent = gist.files[GITHUB_CONFIG.GIST_FILENAME].content;
-            return JSON.parse(fileContent);
+            const file = gist.files[GITHUB_CONFIG.GIST_FILENAME];
+            
+            if (!file || !file.content) {
+                throw new Error('File content is empty or missing');
+            }
+            
+            return JSON.parse(file.content);
         } catch (error) {
             console.error('Error loading data:', error);
             return {
