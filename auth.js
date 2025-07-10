@@ -24,18 +24,13 @@ class GitHubAuth {
                 }
             });
             
-            console.log('GitHub API response status:', response.status);
-            
             if (response.ok) {
                 this.user = await response.json();
                 return this.user;
             } else {
-                const errorText = await response.text();
-                console.error('GitHub API error:', response.status, errorText);
-                throw new Error(`GitHub API error: ${response.status} - ${errorText}`);
+                throw new Error('Authentication failed');
             }
         } catch (error) {
-            console.error('Error fetching user:', error);
             throw error;
         }
     }
@@ -95,8 +90,6 @@ class GitHubAuth {
         // Verify token and user
         try {
             const user = await this.getCurrentUser();
-            console.log('Retrieved user:', user);
-            console.log('Expected user:', GITHUB_CONFIG.AUTHORIZED_USER);
             
             if (user && user.login === GITHUB_CONFIG.AUTHORIZED_USER) {
                 this.hideTokenInput();
@@ -104,15 +97,14 @@ class GitHubAuth {
             } else {
                 this.logout();
                 if (!user) {
-                    throw new Error('Invalid token - unable to get user info');
+                    throw new Error('Invalid token');
                 } else {
-                    throw new Error(`Unauthorized user: ${user.login} (expected: ${GITHUB_CONFIG.AUTHORIZED_USER})`);
+                    throw new Error('Unauthorized user');
                 }
             }
         } catch (error) {
-            console.error('Token validation error:', error);
             this.logout();
-            throw new Error('Token validation failed: ' + error.message);
+            throw error;
         }
     }
 

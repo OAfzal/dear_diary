@@ -66,7 +66,9 @@ async function showDashboard() {
 async function authenticateWithToken() {
     const tokenInput = document.getElementById('token-input') || document.getElementById('token-input-alt');
     const token = tokenInput.value.trim();
-    const errorDiv = document.getElementById('error-message');
+    
+    // Clear any previous error
+    clearError();
     
     if (!token) {
         showError('Please enter a token');
@@ -85,10 +87,11 @@ function showError(message) {
     const errorDiv = document.getElementById('error-message');
     errorDiv.textContent = message;
     errorDiv.style.display = 'block';
-    console.error('Auth error:', message);
-    setTimeout(() => {
-        errorDiv.style.display = 'none';
-    }, 8000);
+}
+
+function clearError() {
+    const errorDiv = document.getElementById('error-message');
+    errorDiv.style.display = 'none';
 }
 
 function logout() {

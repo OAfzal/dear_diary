@@ -21,8 +21,8 @@
         <div class="login-card">
             <h2>Login</h2>
             <div class="token-input-group">
-                <input type="password" id="token-input" placeholder="Enter your GitHub token">
-                <button onclick="authenticateWithToken()">Login</button>
+                <input type="password" id="token-input" placeholder="Enter your GitHub token" onkeypress="if(event.key==='Enter') authenticateWithToken()">
+                <button type="button" onclick="authenticateWithToken()">Login</button>
             </div>
             <div class="error-message" id="error-message" style="display: none;"></div>
         </div>

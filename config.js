@@ -13,7 +13,7 @@ const GITHUB_CONFIG = {
     CLIENT_ID: 'Ov23liKq9ieprLh4XlVu', // Replace with your GitHub OAuth app client ID
     REDIRECT_URI: window.location.origin + window.location.pathname,
     SCOPE: 'gist',
-    AUTHORIZED_USER: 'oafzal', // Replace with your GitHub username
+    AUTHORIZED_USER: 'OAfzal', // Replace with your GitHub username
     GIST_FILENAME: 'personal-tracker-data.json'
 };
 
