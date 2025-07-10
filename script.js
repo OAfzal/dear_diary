@@ -323,7 +323,14 @@ function updateOverview() {
 async function loadData() {
     try {
         const data = await githubAuth.loadData();
-        appData = data;
+        
+        // Ensure all data structures exist
+        appData = {
+            weightData: data.weightData || {},
+            calorieData: data.calorieData || {},
+            diaryData: data.diaryData || {},
+            lastUpdated: data.lastUpdated || new Date().toISOString()
+        };
     } catch (error) {
         console.error('Error loading data:', error);
         showError('Failed to load data from GitHub');
@@ -332,6 +339,8 @@ async function loadData() {
 
 async function saveData() {
     try {
+        // Update timestamp before saving
+        appData.lastUpdated = new Date().toISOString();
         await githubAuth.saveData(appData);
     } catch (error) {
         console.error('Error saving data:', error);
