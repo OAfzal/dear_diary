@@ -93,9 +93,15 @@ async function showDashboard() {
         document.getElementById('user-name').textContent = user.login;
     }
     
-    // Load data and show diary by default
+    // Load data first
     await loadData();
-    await switchTab('diary');
+    
+    // Then manually show diary view without relying on switchTab
+    document.getElementById('diary-view').style.display = 'block';
+    document.getElementById('diary-tab').classList.add('active');
+    updateDiaryTitle();
+    updateDiaryDisplay();
+    loadDiaryEntry();
 }
 
 async function authenticateWithToken() {
