@@ -8,6 +8,18 @@ let appData = {
     lastUpdated: null
 };
 
+// Debug function to test both hypotheses
+function debugDiaryState(location) {
+    console.log(`=== DEBUG ${location} ===`);
+    console.log('appData exists:', !!appData);
+    console.log('appData.diaryData exists:', !!appData.diaryData);
+    console.log('diaryData keys:', Object.keys(appData.diaryData || {}));
+    console.log('entries-list element:', document.getElementById('entries-list'));
+    console.log('diary-view display:', document.getElementById('diary-view').style.display);
+    console.log('diary-view visible:', document.getElementById('diary-view').offsetHeight > 0);
+    console.log('========================');
+}
+
 // Initialize app on load
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
@@ -100,6 +112,8 @@ async function showDashboard() {
     document.getElementById('diary-view').style.display = 'block';
     document.getElementById('diary-tab').classList.add('active');
     updateDiaryTitle();
+    
+    debugDiaryState('BEFORE updateDiaryDisplay in showDashboard');
     updateDiaryDisplay();
     loadDiaryEntry();
 }
@@ -401,6 +415,8 @@ function getDiaryData() {
 }
 
 function updateDiaryDisplay() {
+    debugDiaryState('START of updateDiaryDisplay');
+    
     const diaryData = getDiaryData();
     const dates = Object.keys(diaryData).sort().reverse();
     const entriesList = document.getElementById('entries-list');
@@ -514,6 +530,8 @@ async function loadData() {
             diaryData: data.diaryData || {},
             lastUpdated: data.lastUpdated || new Date().toISOString()
         };
+        
+        debugDiaryState('AFTER loadData()');
     } catch (error) {
         console.error('Error loading data:', error);
         showError('Failed to load data from GitHub');
@@ -540,6 +558,8 @@ async function loadDashboard() {
     
     updateWeightDisplay();
     updateCalorieDisplay();
+    
+    debugDiaryState('BEFORE updateDiaryDisplay in loadDashboard');
     updateDiaryDisplay();
     updateOverview();
     loadDiaryEntry();
