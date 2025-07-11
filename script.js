@@ -108,7 +108,15 @@ async function showDashboard() {
     // Load data first
     await loadData();
     
-    // Then manually show diary view without relying on switchTab
+    // Hide all views first
+    document.getElementById('diary-view').style.display = 'none';
+    document.getElementById('dashboard-view').style.display = 'none';
+    
+    // Remove active class from all tabs
+    document.getElementById('diary-tab').classList.remove('active');
+    document.getElementById('dashboard-tab').classList.remove('active');
+    
+    // Then show diary view and set active tab
     document.getElementById('diary-view').style.display = 'block';
     document.getElementById('diary-tab').classList.add('active');
     updateDiaryTitle();
@@ -186,7 +194,7 @@ async function switchTab(tabName) {
 // Update diary title based on selected date
 function updateDiaryTitle() {
     const dateInput = document.getElementById('diary-date');
-    const titleElement = document.getElementById('diary-entry-title');
+    const titleElement = document.getElementById('diary-entry-date');
     
     if (dateInput.value) {
         const selectedDate = new Date(dateInput.value);
